@@ -6,6 +6,7 @@ import os
 #         Variables
 directory = "Resources/F1-GPs/"
 trackNames = [None]*28
+compareArray = [None]*24
 Tracks = np.zeros((28,250,250),np.uint8)
 lenTracks = 0
 counter = 0
@@ -19,7 +20,7 @@ def preprocessing(img):
 
     return imgSquare
 
-
+# Takes in an image and returns the black and white outline of the track as a new image
 def getOutline(img):
     outlineColor = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
     isolatedOutline = np.zeros_like(outlineColor)
@@ -31,9 +32,8 @@ def getOutline(img):
         area = cv2.contourArea(cnt)
         # cv2.imshow("in Loop", imgCanny)
         if area > 100:
-            cv2.drawContours(isolatedOutline,cnt,-1,(0,0,255),2)
+            cv2.drawContours(isolatedOutline,cnt,-1,(255,255,255),2)
             perim = cv2.arcLength(cnt,True)
-    cv2.imshow("2",isolatedOutline)
     return cv2.cvtColor(isolatedOutline,cv2.COLOR_BGR2GRAY)
 
 
@@ -46,6 +46,7 @@ def toImgMatrix(array):
     finalMatrix = np.concatenate((final_row1,final_row2,final_row3,final_row4),axis=0)
     return finalMatrix
 
+# Method to get the index of the smallest number in a list
 def getMinIndex(array):
     minIndex = 0
     minDiff = 1
@@ -71,8 +72,7 @@ counter = 0
 userTrack = preprocessing(cv2.imread("Resources/userTrack/userTrack.jpg"))
 
 cv2.imshow("userTrack", userTrack)
-compareArray = [None]*24
-print("len tracks: ",lenTracks)
+# print("len tracks: ",lenTracks)
 
 for counter in range(lenTracks):
     compareArray[counter] = cv2.matchShapes(getOutline(Tracks[counter]),getOutline(userTrack),1,0.0)
@@ -81,21 +81,15 @@ print("Prediction: ",trackNames[predictionIndex])
 cv2.imshow("Prediction Img",Tracks[predictionIndex])
 cv2.imshow("user outline", getOutline(userTrack))
 
-print(compareArray)
-print(trackNames)
+# print(compareArray)
+# print(trackNames)
 
 ################################
 #       testing methods
-cv2.imshow("test toImgMatrix", getOutline(toImgMatrix(Tracks)))
+# cv2.imshow("test toImgMatrix", getOutline(toImgMatrix(Tracks)))
 # cv2.imshow("tracks[0] Raw", Tracks[14])
 # cv2.imshow("test getOutline", getOutline(userTrack))
-cv2.imshow("outline",getOutline(Tracks[10]))
-
+# cv2.imshow("outline",getOutline(Tracks[10]))
 ################################
 
 cv2.waitKey(0)
-
-# Fix findOutline - DONE
-# Add bounding box to outline
-# Find center of bounding box
-# Method for rotating and checking between user outline and database
